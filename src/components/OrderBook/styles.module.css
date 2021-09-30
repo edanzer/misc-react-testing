@@ -1,0 +1,13 @@
+.orderbook {
+    background: #222222;
+    color: #dddddd;
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 50px auto 80px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 
+        "header header"
+        "buy sell"
+        "footer footer";
+}

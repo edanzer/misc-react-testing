@@ -1,0 +1,26 @@
+.row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.row.buy {
+  flex-direction: row-reverse;
+}
+
+.item {
+  text-align: center;
+  flex: 0 0 30%;
+  font-size: .8rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: .25rem 0;
+}
+
+.item.buy {
+  color: #00A36C;
+}
+
+.item.sell {
+  color: #EE4B2B;
+}

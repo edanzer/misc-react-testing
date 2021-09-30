@@ -1,0 +1,7 @@
+.buy {
+    grid-area: buy;
+}
+
+.sell {
+    grid-area: sell;
+}
