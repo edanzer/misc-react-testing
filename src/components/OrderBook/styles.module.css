@@ -1,3 +1,4 @@
+/* Orderbook */
 .orderbook {
     background: #222222;
     color: #dddddd;
@@ -10,4 +11,102 @@
         "header header"
         "buy sell"
         "footer footer";
+}
+
+/* Orderbook Header */
+.header {
+    grid-area: header;
+    background: #1a1a1a;
+    display: grid;
+    grid-template-columns: 150px auto;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+.title {
+    font-weight: 700;
+}
+
+.spread {
+    text-align: center;
+    color: #888888;
+}
+
+/* Orderbook Tables */
+
+.buyTable {
+    grid-area: buy;
+}
+
+.sellTable {
+    grid-area: sell;
+}
+
+.tableHeader {
+    background: #1a1a1a;
+    border-top: 1px solid #444444;
+    border-bottom: 1px solid #333333;
+    color: #333333;
+    font-size: .8rem;
+    font-weight: 700;
+    padding: .5rem 0;
+    text-transform: uppercase;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.tableTitle {
+    color: #666666;
+    text-align: center;
+    flex: 0 0 30%;
+    font-size: .8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: .25rem 0;
+    letter-spacing: .5px;
+}
+
+.row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+  
+.item {
+    text-align: center;
+    flex: 0 0 30%;
+    font-size: .8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: .25rem 0;
+}
+  
+.buyPrice {
+    color: #00A36C;
+}
+  
+.sellPrice {
+    color: #EE4B2B;
+}
+
+.buy {
+    flex-direction: row-reverse;
+}
+
+.footer {
+    grid-area: footer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toggle {
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    outline: none;
+    padding: 8px 16px;
+    border-radius: 3px;
+    font-weight: 700;
 }
