@@ -1,7 +1,10 @@
 // Import Styles
 import styles from "./styles.module.css"
+import { useOrders }  from "../../hooks/useOrders"
 
 export const OrderBook = () => {
+
+    useOrders();
     return (
         <div className={styles.orderbook}>
             <div className={styles.header}>
