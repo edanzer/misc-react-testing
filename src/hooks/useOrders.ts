@@ -2,7 +2,7 @@
 import { useEffect } from "react"
 
 // eslint-disable-next-line
-import Worker from "worker-loader!../workers/worker.ts";
+import Worker from "worker-loader!../workers/orders.worker.ts";
 
 export const useOrders = () => {
     useEffect(() => {
