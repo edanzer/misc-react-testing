@@ -1,15 +1,25 @@
 // Import Resources
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { FinishedOrderList } from "../types/orderBookTypes";
 
 // eslint-disable-next-line
 import Worker from "worker-loader!../workers/orders.worker.ts";
 
 export const useOrders = () => {
+
+    const [ asks, setAsks ] = useState<FinishedOrderList>([])
+    const [ bids, setBids ] = useState<FinishedOrderList>([])
+
     useEffect(() => {
         const worker = new Worker()
         function handleMessage(e: any) {
-            console.log(e)
+            if (e.data.type === "SNAPSHOT") {
+                setAsks(e.data.asks)
+                setBids(e.data.bids)
+            }
         }
         worker.addEventListener('message', handleMessage);
     }, [])
+
+    return { asks, bids } 
 }
