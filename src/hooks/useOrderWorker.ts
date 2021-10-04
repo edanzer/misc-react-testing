@@ -5,7 +5,7 @@ import { FinishedOrderList } from "../types/orderBookTypes";
 // eslint-disable-next-line
 import Worker from "worker-loader!../workers/orders.worker.ts";
 
-export const useOrders = () => {
+export const useOrderWorker = () => {
 
     const [ asks, setAsks ] = useState<FinishedOrderList>([])
     const [ bids, setBids ] = useState<FinishedOrderList>([])

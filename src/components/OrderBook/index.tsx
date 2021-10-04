@@ -1,4 +1,4 @@
-import { useOrders }  from "../../hooks/useOrders"
+import { useOrderWorker }  from "../../hooks/useOrderWorker"
 import { FinishedOrder } from "../../types/orderBookTypes"
 
 // Import Styles
@@ -6,7 +6,7 @@ import styles from "./styles.module.css"
 
 export const OrderBook = () => {
 
-    const { asks, bids } = useOrders();
+    const { asks, bids } = useOrderWorker();
 
     return (
         <div className={styles.orderbook}>
