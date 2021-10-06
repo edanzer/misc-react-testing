@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { FinishedOrderList } from "../types/orderBookTypes";
 
 // eslint-disable-next-line
-import Worker from "worker-loader!../workers/orders.worker.ts";
+import Worker from "worker-loader!../api/workers/orderbook/orders.worker.ts";
 
 export const useOrderWorker = () => {
 
@@ -13,9 +13,10 @@ export const useOrderWorker = () => {
     useEffect(() => {
         const worker = new Worker()
         function handleMessage(e: any) {
-            if (e.data.type === "SNAPSHOT") {
-                setAsks(e.data.asks)
-                setBids(e.data.bids)
+            if (e.data.type === "initial" || e.data.type === "update") {
+                // console.log(e);
+                setAsks(e.data.finishedOrderBook.asks)
+                setBids(e.data.finishedOrderBook.bids)
             }
         }
         worker.addEventListener('message', handleMessage);

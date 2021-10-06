@@ -22,10 +22,10 @@ export const OrderBook = () => {
                 </div>
                     {
                         bids.map((row: FinishedOrder) => (
-                            <div key={row[0].toFixed(2)} className={`${styles.row} ${styles.buy}`}>
-                                <div className={`${styles.item} ${styles.buyPrice}`}>{row[0].toFixed(2)}</div>
-                                <div className={styles.item}>{row[1].toLocaleString('en')}</div>
-                                <div className={styles.item}>{row[2].toLocaleString('en')}</div>
+                            <div key={row.price.toFixed(2)} className={`${styles.row} ${styles.buy}`}>
+                                <div className={`${styles.item} ${styles.buyPrice}`}>{row.price.toFixed(2)}</div>
+                                <div className={styles.item}>{row.size.toLocaleString('en')}</div>
+                                <div className={styles.item}>{row.total.toLocaleString('en')}</div>
                             </div>
                         ))
                     }
@@ -38,10 +38,10 @@ export const OrderBook = () => {
                 </div>
                     {
                         asks.map((row: FinishedOrder) => (
-                            <div key={row[0].toFixed(2)} className={styles.row}>
-                                <div className={`${styles.item} ${styles.sellPrice}`}>{row[0].toFixed(2)}</div>
-                                <div className={styles.item}>{row[1].toLocaleString('en')}</div>
-                                <div className={styles.item}>{row[2].toLocaleString('en')}</div>
+                            <div key={row.price.toFixed(2)} className={styles.row}>
+                                <div className={`${styles.item} ${styles.sellPrice}`}>{row.price.toFixed(2)}</div>
+                                <div className={styles.item}>{row.size.toLocaleString('en')}</div>
+                                <div className={styles.item}>{row.total.toLocaleString('en')}</div>
                             </div>
                         ))
                     }
