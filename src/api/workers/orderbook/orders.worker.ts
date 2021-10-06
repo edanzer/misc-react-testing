@@ -33,14 +33,6 @@ import { getUpdatedOrderBook, postOrderBook } from "./helpers"
         } else {
             console.log(data)
         } 
-        // if (data.hasOwnProperty("event")) {
-        //     console.log(data)
-        // } else if (data.hasOwnProperty("feed")) {
-        //     console.log(data)
-        //     rawOrderBook = getUpdatedOrderBook(rawOrderBook, data.asks, data.bids)
-        // } else {
-        //     console.log(data)
-        // }
     };
 
     /* 
@@ -71,7 +63,7 @@ import { getUpdatedOrderBook, postOrderBook } from "./helpers"
     * Periodically post updated orderbook to React 
     */
     const timer = setInterval( () => postOrderBook(OrderBookAction.Update, rawOrderBook), 200 )
-    setTimeout(closeFeed, 4000); // For testing, close webocket after 5 seconds
+    setTimeout(closeFeed, 10000); // For testing, close webocket after 5 seconds
 
 })()
 
