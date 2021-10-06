@@ -37,7 +37,7 @@ feed.onmessage = (event: MessageEvent) => {
 
     } else {
 
-        // updateOrderBook(rawOrderBook, data.asks, data.bids)
+        rawOrderBook = updateOrderBook(rawOrderBook, data.asks, data.bids)
 
     }
 };
@@ -69,10 +69,14 @@ feed.onclose = () => {
 /*
  * Periodically post updated orderbook to React 
  */
-const timer = setInterval( () => postOrderBook(OrderBookAction.Initial, rawOrderBook), 1000 );
+const timer = setInterval( () => postOrderBook(OrderBookAction.Update, rawOrderBook), 1000 );
 setTimeout(closeFeed, 10000); // For testing, close webocket after 5 seconds
 
 // Post updated orderbook to react every half second
 // setInterval(postUpdatedOrderBook, 1000, currentAsks, currentBids); 
 
 export default {}
+
+
+// Question 1: How to handle state in this file
+// Question 2: How to handle periodically returning the order to react

@@ -17,11 +17,13 @@ export function setInitialOrderBook(asks: RawOrderList, bids: RawOrderList): Raw
 /* 
  * Update the orderbook with new values
  */
-export function updateOrderBook(rawOrderBook: RawOrderBook, newAsks: RawOrderList, newBids: RawOrderList) {    
-    const updateOrderbook = {
-        asks: updateRawOrders(rawOrderBook[0], newAsks),
-        bids: updateRawOrders(rawOrderBook[1], newBids)
-    }
+export function updateOrderBook(rawOrderBook: RawOrderBook, newAsks: RawOrderList, newBids: RawOrderList): RawOrderBook {    
+    const updatedOrderbook: RawOrderBook = [
+        updateRawOrders(rawOrderBook[0], newAsks),
+        updateRawOrders(rawOrderBook[1], newBids)
+    ]
+
+    return updatedOrderbook
 }
 
 /*
@@ -34,7 +36,7 @@ export function updateRawOrders(currentOrders: RawOrderList, newOrders: RawOrder
      * If so, return the updated orders.
      * If not, return the existing orders.
      */
-    const updatedOrders = currentOrders.map(currentOrder => {
+    const updatedOrders: RawOrderList = currentOrders.map(currentOrder => {
         let match = newOrders.find(newOrder => newOrder[0] === currentOrder[0])
         return match ? match : currentOrder;
     });
@@ -48,7 +50,7 @@ export function updateRawOrders(currentOrders: RawOrderList, newOrders: RawOrder
 export function postOrderBook(action: OrderBookAction, rawOrderBook: RawOrderBook): void {    
     const finishedOrderBook: FinishedOrderBook = prepareOrderBook(rawOrderBook);
 
-    postMessage({
+    window.postMessage({
         type: action,
         finishedOrderBook
     });
@@ -70,6 +72,24 @@ export function prepareOrderBook(rawOrderBook: RawOrderBook): FinishedOrderBook 
  * Add cumulative order totals
  */
 export function addTotals(orders: RawOrderList): FinishedOrderList {
+    let total = 0
+
+    // Map through orders, update and add the total
+    const ordersWithTotals: FinishedOrderList = orders.map(order => {
+        return {
+            price: order[0],
+            size: order[1],
+            total: total += order[1]
+        }
+    })
+
+    return ordersWithTotals
+}
+
+/* 
+ * Remove order levels with size of 0
+ */
+export function removeZeros(orders: RawOrderList): FinishedOrderList {
     let total = 0
 
     // Map through orders, update and add the total

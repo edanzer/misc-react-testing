@@ -13,8 +13,8 @@ export const useOrderWorker = () => {
     useEffect(() => {
         const worker = new Worker()
         function handleMessage(e: any) {
-            console.log(e);
             if (e.data.type === "initial" || e.data.type === "update") {
+                // console.log(e);
                 setAsks(e.data.finishedOrderBook.asks)
                 setBids(e.data.finishedOrderBook.bids)
             }
