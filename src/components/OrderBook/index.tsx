@@ -7,7 +7,7 @@ import styles from "./styles.module.css"
 export const OrderBook = () => {
 
     const { asks, bids } = useOrderWorker();
-    console.log("asks and bids", asks, bids);
+
     return (
         <div className={styles.orderbook}>
             <div className={styles.header}>

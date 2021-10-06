@@ -3,54 +3,50 @@ import {
     RawOrderBook, 
     FinishedOrderList, 
     FinishedOrderBook,
-    OrderBookAction 
+    OrderBookAction, 
 } from "../../../types/orderBookTypes"
-
-/*
- * Set initial orderbook based on snapshot
- */
-export function setInitialOrderBook(asks: RawOrderList, bids: RawOrderList): RawOrderBook {
-    const rawOrderBook: RawOrderBook = [ asks, bids ]
-    return rawOrderBook
-}
 
 /* 
  * Update the orderbook with new values
  */
-export function updateOrderBook(rawOrderBook: RawOrderBook, newAsks: RawOrderList, newBids: RawOrderList): RawOrderBook {    
-    const updatedOrderbook: RawOrderBook = [
-        updateRawOrders(rawOrderBook[0], newAsks),
-        updateRawOrders(rawOrderBook[1], newBids)
-    ]
+export function getUpdatedOrderBook(rawOrderBook: RawOrderBook, newAsks: RawOrderList, newBids: RawOrderList): RawOrderBook {    
+    if (typeof rawOrderBook === 'undefined') {
+        const updatedOrderbook: RawOrderBook = [ newAsks, newBids ]
+        return updatedOrderbook
+    }
 
+    const updatedOrderbook: RawOrderBook = [
+        removeZeros(getUpdatedOrders(rawOrderBook[0], newAsks)),
+        removeZeros(getUpdatedOrders(rawOrderBook[1], newBids))
+    ]
     return updatedOrderbook
 }
 
 /*
  * Update list of orders with new orders
  */
-export function updateRawOrders(currentOrders: RawOrderList, newOrders: RawOrderList): RawOrderList {
-    /* 
-     * Map over existing orders. 
-     * For each, check if updated orders exist at the same price.
-     * If so, return the updated orders.
-     * If not, return the existing orders.
-     */
-    const updatedOrders: RawOrderList = currentOrders.map(currentOrder => {
-        let match = newOrders.find(newOrder => newOrder[0] === currentOrder[0])
-        return match ? match : currentOrder;
-    });
+export function getUpdatedOrders(currentOrders: RawOrderList, newOrders: RawOrderList): RawOrderList {
+    // First, all new orders should be included
+    let updatedOrders: RawOrderList = newOrders;
 
-    return updatedOrders; 
+    // Second, for old orders, include them if their prices don't match existing orders
+    for (let i=0; i < currentOrders.length; i++) {
+        if (!updatedOrders.find(updatedOrder => updatedOrder[0] == currentOrders[i][0])) {
+            updatedOrders.push(currentOrders[i])
+        }
+    }
+
+    return updatedOrders
 }
 
 /*
  * Post orderbook from this web worker to React
  */
-export function postOrderBook(action: OrderBookAction, rawOrderBook: RawOrderBook): void {    
+export function postOrderBook(action: OrderBookAction, rawOrderBook: RawOrderBook): void { 
+    if (typeof rawOrderBook === 'undefined') return;   
     const finishedOrderBook: FinishedOrderBook = prepareOrderBook(rawOrderBook);
 
-    window.postMessage({
+    postMessage({
         type: action,
         finishedOrderBook
     });
@@ -89,17 +85,7 @@ export function addTotals(orders: RawOrderList): FinishedOrderList {
 /* 
  * Remove order levels with size of 0
  */
-export function removeZeros(orders: RawOrderList): FinishedOrderList {
-    let total = 0
-
-    // Map through orders, update and add the total
-    const ordersWithTotals: FinishedOrderList = orders.map(order => {
-        return {
-            price: order[0],
-            size: order[1],
-            total: total += order[1]
-        }
-    })
-
-    return ordersWithTotals
+export function removeZeros(orders: RawOrderList): RawOrderList {
+    const trimmedOrders: RawOrderList = orders.filter(order => order[1] != 0);
+    return trimmedOrders
 }
