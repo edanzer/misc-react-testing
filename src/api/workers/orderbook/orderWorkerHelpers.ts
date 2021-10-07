@@ -43,7 +43,7 @@ export function getUpdatedOrders(currentOrders: RawOrder[], newOrders: RawOrder[
 /*
  * Post orderbook from this web worker to React
  */
-export function postOrderBook(action: OrderBookAction, rawOrderBook: RawOrderBook): void { 
+export function sendOrderBook(action: OrderBookAction, rawOrderBook: RawOrderBook): void { 
     if (typeof rawOrderBook === 'undefined') return;   
     const finishedOrderBook: FinishedOrderBook = prepareOrderBook(rawOrderBook);
 

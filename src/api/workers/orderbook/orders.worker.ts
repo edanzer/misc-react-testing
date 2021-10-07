@@ -1,5 +1,5 @@
 import { RawOrderBook } from "../../../types/orderBookTypes"
-import { getUpdatedOrderBook, postOrderBook } from "./orderWorkerHelpers"
+import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
 
 (function OrderWorker() {
 
@@ -62,7 +62,7 @@ import { getUpdatedOrderBook, postOrderBook } from "./orderWorkerHelpers"
     /*
     * Periodically post updated orderbook to React 
     */
-    const timer = setInterval( () => postOrderBook("update", rawOrderBook), 200 )
+    const timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200 )
     setTimeout(closeFeed, 10000); // For testing, close webocket after 5 seconds
 
 })()
