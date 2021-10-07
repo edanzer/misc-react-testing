@@ -1,5 +1,5 @@
 import { RawOrderBook } from "../../../types/orderBookTypes"
-import { getUpdatedOrderBook, postOrderBook } from "./helpers"
+import { getUpdatedOrderBook, postOrderBook } from "./orderWorkerHelpers"
 
 (function OrderWorker() {
 
