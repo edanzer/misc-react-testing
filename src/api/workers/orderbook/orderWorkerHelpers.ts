@@ -58,8 +58,8 @@ export function sendOrderBook(action: OrderBookAction, rawOrderBook: RawOrderBoo
  */
 export function prepareOrderBook(rawOrderBook: RawOrderBook): FinishedOrderBook {
     const finishedOrderBook: FinishedOrderBook = {
-        asks: getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[0])),"asks")),
-        bids: getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[1])),"bids"))
+        asks: getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[0])),"ask")),
+        bids: getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[1])),"bid"))
     }
 
     return finishedOrderBook
@@ -88,8 +88,8 @@ export function trimTo25Orders(orders: RawOrder[]): RawOrder[] {
  */
 export function sortOrders(orders: RawOrder[], orderType: OrderType) {
     const sortedOrders: RawOrder[] = orders.sort((a: RawOrder, b: RawOrder): number => {
-        if (orderType === "asks") return a[0] - b[0]
-        if (orderType === "bids") return b[0] - a[0]
+        if (orderType === "ask") return a[0] - b[0]
+        if (orderType === "bid") return b[0] - a[0]
         return 0
     });
 

@@ -1,16 +1,14 @@
-import { FinishedOrder } from "../../types/orderBookTypes"
+import { FinishedOrder, OrderType } from "../../types/orderBookTypes"
 
 // Import Styles
 import styles from "./styles.module.css"
 
 interface OrderBookTableProps {
     orders: FinishedOrder[],
-    orderType: string
+    orderType: OrderType
 }
 
 export const OrderBookTable = ({orders, orderType}: OrderBookTableProps) => {
-
-    const tableType = (orderType === "buy") ? "buyTable" : "sellTable"
 
     return (
         <div className={styles[orderType + "Table"]}>

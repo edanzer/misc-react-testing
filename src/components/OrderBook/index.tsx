@@ -28,8 +28,8 @@ export const OrderBook = () => {
                 <div className={styles.title}>Order Book</div>
                 <div className={styles.spread}>Spread: {`${spread} (${spreadPercent})`}</div>
             </div>
-            <OrderBookTable orderType="buy" orders={bids} />
-            <OrderBookTable orderType="sell" orders={asks} />
+            <OrderBookTable orderType="bid" orders={bids} />
+            <OrderBookTable orderType="ask" orders={asks} />
             <div className={styles.footer}>
                 <button className={styles.toggle}>Toggle Feed</button>
             </div>
