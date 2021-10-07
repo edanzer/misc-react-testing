@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { useOrderWorker }  from "../../hooks/useOrderWorker"
 import { FinishedOrder } from "../../types/orderBookTypes"
 
@@ -6,15 +7,28 @@ import styles from "./styles.module.css"
 
 export const OrderBook = () => {
 
-    const { asks, bids } = useOrderWorker();
+    const { asks, bids } = useOrderWorker()
+    const [ spread, setSpread ] = useState<number>(0)
+    const [ spreadPercent, setSpreadPercent ] = useState<string>('')
+    
+    useEffect(() => {
+        if (asks[0] && bids[0]) setSpread(asks[0].price - bids[0].price)
+    }, [asks, bids])
+
+    useEffect(() => {
+        if (asks[0] && bids [0]) {
+            const percent = (spread/asks[0].price).toLocaleString('en-US',{style: 'percent', minimumFractionDigits:2})
+            setSpreadPercent(percent);
+        }
+    }, [spread])
 
     return (
         <div className={styles.orderbook}>
             <div className={styles.header}>
                 <div className={styles.title}>Order Book</div>
-                <div className={styles.spread}>Spread</div>
+                <div className={styles.spread}>Spread: {`${spread} (${spreadPercent})`}</div>
             </div>
-            <div className={styles.buyTable}>
+            <div className={`${styles.table} ${styles.buyTable}`}>
                 <div className={`${styles.tableHeader} ${styles.buy}`}>
                     <div className={styles.item}>Price</div>
                     <div className={styles.item}>Size</div>
@@ -30,7 +44,7 @@ export const OrderBook = () => {
                         ))
                     }
             </div>
-            <div className={styles.sellTable}>
+            <div className={`${styles.table} ${styles.sellTable}`}>
                 <div className={styles.tableHeader}>
                     <div className={styles.item}>Price</div>
                     <div className={styles.item}>Size</div>
