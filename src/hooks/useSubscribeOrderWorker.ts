@@ -1,14 +1,14 @@
 // Import Resources
 import { useEffect, useState } from "react"
-import { FinishedOrderList } from "../types/orderBookTypes";
+import { FinishedOrder } from "../types/orderBookTypes";
 
 // eslint-disable-next-line
 import Worker from "worker-loader!../api/workers/orderbook/orders.worker.ts";
 
-export const useOrderWorker = () => {
+export const useSubscribeOrderWorker = () => {
 
-    const [ asks, setAsks ] = useState<FinishedOrderList>([])
-    const [ bids, setBids ] = useState<FinishedOrderList>([])
+    const [ asks, setAsks ] = useState<FinishedOrder[]>([])
+    const [ bids, setBids ] = useState<FinishedOrder[]>([])
 
     useEffect(() => {
         const worker = new Worker()

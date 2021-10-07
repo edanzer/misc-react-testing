@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useOrderWorker }  from "../../hooks/useOrderWorker"
+import { useSubscribeOrderWorker }  from "../../hooks/useSubscribeOrderWorker"
 import { FinishedOrder } from "../../types/orderBookTypes"
 
 // Import Styles
@@ -7,7 +7,7 @@ import styles from "./styles.module.css"
 
 export const OrderBook = () => {
 
-    const { asks, bids } = useOrderWorker()
+    const { asks, bids } = useSubscribeOrderWorker()
     const [ spread, setSpread ] = useState<number>(0)
     const [ spreadPercent, setSpreadPercent ] = useState<string>('')
     
