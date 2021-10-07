@@ -12,8 +12,8 @@ export type RawOrder = [Price, Size]
 export type RawOrderBook = [ RawOrder[], RawOrder[] ]
 
 // Finished orders, with totals, sent from worker to react
-export type FinishedOrder = {price: Price, size: Size, total: Total}
-export type FinishedOrderBook = {asks: FinishedOrder[], bids: FinishedOrder[]}
+export interface FinishedOrder {price: Price, size: Size, total: Total}
+export interface FinishedOrderBook {asks: FinishedOrder[], bids: FinishedOrder[]}
 
 // Orderbook actions and types
 export type OrderBookAction = "initial" | "update" | "clear"

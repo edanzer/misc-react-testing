@@ -31,11 +31,11 @@ export function getUpdatedOrders(currentOrders: RawOrder[], newOrders: RawOrder[
     let updatedOrders: RawOrder[] = newOrders;
 
     // Second, for old orders, include them if their prices don't match existing orders
-    for (let i=0; i < currentOrders.length; i++) {
-        if (!updatedOrders.find(updatedOrder => updatedOrder[0] == currentOrders[i][0])) {
-            updatedOrders.push(currentOrders[i])
+    currentOrders.forEach((value, index, array) => {
+        if (!updatedOrders.find(updatedOrder => updatedOrder[0] == currentOrders[index][0])) {
+            updatedOrders.push(currentOrders[index])
         }
-    }
+    })
 
     return updatedOrders
 }
@@ -104,10 +104,11 @@ export function getTotals(orders: RawOrder[]): FinishedOrder[] {
 
     // Map through orders, update and add the total
     const ordersWithTotals: FinishedOrder[] = orders.map(order => {
+        total = total + order[1]
         return {
             price: order[0],
             size: order[1],
-            total: total += order[1]
+            total
         }
     })
 
