@@ -5,7 +5,9 @@
     width: 100%;
     height: 100vh;
     display: grid;
-    grid-template-rows: 50px auto 80px;
+    position: relative;
+    margin: 0 auto;
+    grid-template-rows: 50px auto 50px;
     grid-template-columns: 1fr 1fr;
     grid-template-areas: 
         "header header"
@@ -21,6 +23,7 @@
     grid-template-columns: 150px auto;
     align-items: center;
     padding: 0 1rem;
+    position: sticky;
 }
 
 .title {
@@ -30,23 +33,31 @@
 .spread {
     text-align: center;
     color: #888888;
+    font-size: .8rem;
+    font-weight: 700;
+    margin-left: -150px;
 }
 
 /* Orderbook Tables */
-
 .buyTable {
     grid-area: buy;
+    position: relative;
+    max-height: 100%;
+    overflow: auto;
 }
 
 .sellTable {
     grid-area: sell;
+    position: relative;
+    max-height: 100%;
+    overflow: auto;
 }
 
 .tableHeader {
     background: #1a1a1a;
     border-top: 1px solid #444444;
     border-bottom: 1px solid #333333;
-    color: #333333;
+    color: #888888;
     font-size: .8rem;
     font-weight: 700;
     padding: .5rem 0;
@@ -57,7 +68,6 @@
 }
 
 .tableTitle {
-    color: #666666;
     text-align: center;
     flex: 0 0 30%;
     font-size: .8rem;
@@ -99,6 +109,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #1a1a1a;
 }
 
 .toggle {
