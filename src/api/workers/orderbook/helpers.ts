@@ -1,23 +1,24 @@
 import { 
-    RawOrderList, 
-    RawOrderBook, 
-    FinishedOrderList, 
+    RawOrder,
+    RawOrderBook,
+    FinishedOrder,
     FinishedOrderBook,
     OrderBookAction, 
+    OrderType
 } from "../../../types/orderBookTypes"
 
 /* 
  * Update the orderbook with new values
  */
-export function getUpdatedOrderBook(rawOrderBook: RawOrderBook, newAsks: RawOrderList, newBids: RawOrderList): RawOrderBook {    
+export function getUpdatedOrderBook(rawOrderBook: RawOrderBook, newAsks: RawOrder[], newBids: RawOrder[]): RawOrderBook {    
     if (typeof rawOrderBook === 'undefined') {
         const updatedOrderbook: RawOrderBook = [ newAsks, newBids ]
         return updatedOrderbook
     }
-
+    
     const updatedOrderbook: RawOrderBook = [
-        removeZeros(getUpdatedOrders(rawOrderBook[0], newAsks)),
-        removeZeros(getUpdatedOrders(rawOrderBook[1], newBids))
+        getUpdatedOrders(rawOrderBook[0], newAsks),
+        getUpdatedOrders(rawOrderBook[1], newBids)
     ]
     return updatedOrderbook
 }
@@ -25,9 +26,9 @@ export function getUpdatedOrderBook(rawOrderBook: RawOrderBook, newAsks: RawOrde
 /*
  * Update list of orders with new orders
  */
-export function getUpdatedOrders(currentOrders: RawOrderList, newOrders: RawOrderList): RawOrderList {
+export function getUpdatedOrders(currentOrders: RawOrder[], newOrders: RawOrder[]): RawOrder[] {
     // First, all new orders should be included
-    let updatedOrders: RawOrderList = newOrders;
+    let updatedOrders: RawOrder[] = newOrders;
 
     // Second, for old orders, include them if their prices don't match existing orders
     for (let i=0; i < currentOrders.length; i++) {
@@ -57,21 +58,52 @@ export function postOrderBook(action: OrderBookAction, rawOrderBook: RawOrderBoo
  */
 export function prepareOrderBook(rawOrderBook: RawOrderBook): FinishedOrderBook {
     const finishedOrderBook: FinishedOrderBook = {
-        asks: addTotals(rawOrderBook[0]),
-        bids: addTotals(rawOrderBook[1])
+        asks: getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[0])),"asks")),
+        bids: getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[1])),"bids"))
     }
-    
+
     return finishedOrderBook
+}
+
+/* 
+ * Remove order levels with size of 0
+ */
+export function removeZeros(orders: RawOrder[]): RawOrder[] {
+    const nonZeroOrders: RawOrder[] = orders.filter(order => order[1] != 0);
+    return nonZeroOrders
+}
+
+/* 
+ * Trim to max of 25 orders
+ */
+export function trimTo25Orders(orders: RawOrder[]): RawOrder[] {
+    if (orders.length <= 25) return orders;
+
+    const trimmedOrders = orders.slice(0, 25); 
+    return trimmedOrders
+}
+
+/* 
+ * Ensure orders are sorted in correct order
+ */
+export function sortOrders(orders: RawOrder[], orderType: OrderType) {
+    const sortedOrders: RawOrder[] = orders.sort((a: RawOrder, b: RawOrder): number => {
+        if (orderType === "asks") return a[0] - b[0]
+        if (orderType === "bids") return b[0] - a[0]
+        return 0
+    });
+
+    return sortedOrders
 }
 
 /* 
  * Add cumulative order totals
  */
-export function addTotals(orders: RawOrderList): FinishedOrderList {
+export function getTotals(orders: RawOrder[]): FinishedOrder[] {
     let total = 0
 
     // Map through orders, update and add the total
-    const ordersWithTotals: FinishedOrderList = orders.map(order => {
+    const ordersWithTotals: FinishedOrder[] = orders.map(order => {
         return {
             price: order[0],
             size: order[1],
@@ -80,12 +112,4 @@ export function addTotals(orders: RawOrderList): FinishedOrderList {
     })
 
     return ordersWithTotals
-}
-
-/* 
- * Remove order levels with size of 0
- */
-export function removeZeros(orders: RawOrderList): RawOrderList {
-    const trimmedOrders: RawOrderList = orders.filter(order => order[1] != 0);
-    return trimmedOrders
 }
