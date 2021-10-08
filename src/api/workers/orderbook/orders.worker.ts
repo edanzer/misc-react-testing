@@ -3,68 +3,82 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
 
 (function OrderWorker() {
 
-    let rawOrderBook: RawOrderBook;
+    let rawOrderBook: RawOrderBook
+    let socket: WebSocket
+    let currentPair: string = ''
 
-    /* 
-    * Send request to open websocket
-    */
-    const feed = new WebSocket("wss://www.cryptofacilities.com/ws/v1")
-
-    /* 
-    * When websocket is confirmed, send request to subscribe to feed
-    */
-    feed.onopen = () => {
-        const subscription = {
-            "event": "subscribe",
-            "feed": "book_ui_1",
-            "product_ids": ["PI_XBTUSD"]
-        }
-        feed.send(JSON.stringify(subscription))
+    onmessage = e => {
+        const message = e.data
+        switch(message.action) {
+            case "open":
+                if (socket) closeSocket(currentPair)
+                openSocket(message.url, message.pair)
+                break;
+            case "close":
+                closeSocket(message.pair)
+                break;
+            default:
+                console.log('Invalid action');
+          }
     };
 
-    /* 
-    * Handle all messages received via websocket
-    */
-    feed.onmessage = (event: MessageEvent) => {
-        const data = JSON.parse(event.data)
-        
-        if (data.hasOwnProperty("bids")) {
-            rawOrderBook = getUpdatedOrderBook(rawOrderBook, data.asks, data.bids)
-        } else {
-            console.log(data)
-        } 
-    };
+    function openSocket(url: string, pair: string) {
 
-    /* 
-    * Send request to close websocket
-    */
-    function closeFeed() {
+        socket = new WebSocket(url)
+
+        socket.onopen = () => {
+            const subscription = {
+                "event": "subscribe",
+                "feed": "book_ui_1",
+                "product_ids": [pair]
+            }
+            socket.send(JSON.stringify(subscription))
+            currentPair = pair
+        };
+
+        socket.onmessage = (event: MessageEvent) => {
+            const data = JSON.parse(event.data)
+            
+            if (data.hasOwnProperty("bids")) {
+                rawOrderBook = getUpdatedOrderBook(rawOrderBook, data.asks, data.bids)
+            } else {
+                console.log(data)
+            } 
+        };
+
+        socket.onmessage = (event: MessageEvent) => {
+            const data = JSON.parse(event.data)
+            
+            if (data.hasOwnProperty("bids")) {
+                rawOrderBook = getUpdatedOrderBook(rawOrderBook, data.asks, data.bids)
+            } else {
+                console.log(data)
+            } 
+        };
+
+        socket.onclose = () => {
+            console.log("Socket closed.")
+            clearTimeout(timer);
+        };
+
+        const timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200 )
+        setTimeout(closeSocket, 10000); // For testing, close webocket after 5 seconds
+
+    }
+
+    function closeSocket(pair: string) {
         const unsubscribe = {
             event: "unsubscribe",
             feed: "book_ui_1",
-            product_ids: "PI_XBTUSD",
+            product_ids: pair,
         }
-        feed.send(JSON.stringify(unsubscribe))
-        feed.close()
+        socket.send(JSON.stringify(unsubscribe))
+        socket.close()
+        currentPair = ''
         postMessage({
             type: "FEED_KILLED",
         })
     }
-
-    /* 
-    * Run any needed action when websocket is confirmed as closed
-    */
-    feed.onclose = () => {
-        console.log("Feed was closed!")
-        clearTimeout(timer);
-    };
-
-    /*
-    * Periodically post updated orderbook to React 
-    */
-    const timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200 )
-    setTimeout(closeFeed, 10000); // For testing, close webocket after 5 seconds
-
 })()
 
 export default {}
