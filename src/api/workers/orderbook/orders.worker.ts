@@ -6,21 +6,30 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
     let rawOrderBook: RawOrderBook
     let socket: WebSocket
     let currentPair: string = ''
+    let timer: NodeJS.Timeout
 
+    /* 
+     * Handle messages from React 
+     */
     onmessage = e => {
         const message = e.data
         switch(message.action) {
             case "open":
-                if (socket) closeSocket(currentPair)
                 openSocket(message.url, message.pair)
+                currentPair = message.pair
+                break;
+            case "switch":
+                closeSocket(currentPair)
+                openSocket(message.url,message.pair)
+                currentPair = message.pair
                 break;
             case "close":
                 closeSocket(message.pair)
                 break;
             default:
                 console.log('Invalid action');
-          }
-    };
+        }
+    }
 
     function openSocket(url: string, pair: string) {
 
@@ -34,16 +43,8 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
             }
             socket.send(JSON.stringify(subscription))
             currentPair = pair
-        };
-
-        socket.onmessage = (event: MessageEvent) => {
-            const data = JSON.parse(event.data)
-            
-            if (data.hasOwnProperty("bids")) {
-                rawOrderBook = getUpdatedOrderBook(rawOrderBook, data.asks, data.bids)
-            } else {
-                console.log(data)
-            } 
+            timer = setInterval( () => sendOrderBook("update", rawOrderBook), 1000 )
+            setTimeout(closeSocket, 10000); // For testing, close webocket after 5 seconds
         };
 
         socket.onmessage = (event: MessageEvent) => {
@@ -58,15 +59,13 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
 
         socket.onclose = () => {
             console.log("Socket closed.")
-            clearTimeout(timer);
+            clearTimeout(timer)
         };
-
-        const timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200 )
-        setTimeout(closeSocket, 10000); // For testing, close webocket after 5 seconds
 
     }
 
     function closeSocket(pair: string) {
+        clearInterval(timer)
         const unsubscribe = {
             event: "unsubscribe",
             feed: "book_ui_1",
@@ -75,9 +74,9 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
         socket.send(JSON.stringify(unsubscribe))
         socket.close()
         currentPair = ''
-        postMessage({
-            type: "FEED_KILLED",
-        })
+        // postMessage({
+        //     type: "FEED_KILLED",
+        // })
     }
 })()
 
