@@ -17,7 +17,9 @@ export const OrderBook = () => {
         if (asks[0] && bids[0]) {
             setSpread(asks[0].price - bids[0].price)
             setTotalAsks(asks[asks.length-1].total)
-            setTotalBids(asks[bids.length-1].total)
+            setTotalBids(bids[bids.length-1].total)
+            console.log(bids)
+            console.log(totalBids)
         }
     }, [asks, bids])
 
