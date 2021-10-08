@@ -1,34 +1,48 @@
 // Import Resources
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { FinishedOrder } from "../types/orderBookTypes";
 
 // eslint-disable-next-line
 import Worker from "worker-loader!../api/workers/orderbook/orders.worker.ts";
 
 export const useSubscribeOrderWorker = () => {
+    let worker = useRef<Worker | null>(null);
+    const url = "wss://www.cryptofacilities.com/ws/v1"
+
     const [ asks, setAsks ] = useState<FinishedOrder[]>([])
     const [ bids, setBids ] = useState<FinishedOrder[]>([])
-    const url = "wss://www.cryptofacilities.com/ws/v1"
-    const pair = "PI_XBTUSD"
+    const [ pair, setPair ] = useState<string>("PI_XBTUSD")
+    
+    function handleMessage(e: MessageEvent) {
+        console.log(e);
+        if (e.data.type === "initial" || e.data.type === "update") {
+            setAsks(e.data.finishedOrderBook.asks)
+            setBids(e.data.finishedOrderBook.bids)
+        }
+    }
 
     useEffect(() => {
-        const worker = new Worker()
+        if (!worker.current) {
+            worker.current = new Worker()
 
-        worker.postMessage({
-            action: "open",
-            url,
-            pair
-        })
-
-        function handleMessage(e: MessageEvent) {
-            console.log(e);
-            if (e.data.type === "initial" || e.data.type === "update") {
-                setAsks(e.data.finishedOrderBook.asks)
-                setBids(e.data.finishedOrderBook.bids)
-            }
+            worker.current.postMessage({
+                action: "open",
+                url,
+                pair
+            })
+    
+            worker.current.addEventListener('message', handleMessage);
         }
-        worker.addEventListener('message', handleMessage);
-    }, [])
 
-    return { asks, bids } 
+        return () => {
+            if (worker.current !== null) {
+                worker.current.postMessage({
+                    action: "close",
+                })
+            }
+            worker.current = null;
+        }
+    }, [pair])
+
+    return { asks, bids, pair, setPair } 
 }
