@@ -7,7 +7,8 @@ import styles from "./styles.module.css"
 
 export const OrderBook = () => {
 
-    const { asks, bids } = useSubscribeOrderWorker()
+    const { asks, bids, pair, setPair } = useSubscribeOrderWorker()
+
     const [ spread, setSpread ] = useState<number>(0)
     const [ spreadPercent, setSpreadPercent ] = useState<string>('')
     const [ totalAsks, setTotalAsks ] = useState<number>(0)
@@ -22,22 +23,29 @@ export const OrderBook = () => {
     }, [asks, bids])
 
     useEffect(() => {
-        if (asks[0] && bids [0]) {
+        if (asks[0] && bids[0]) {
             const percent = (spread/asks[0].price).toLocaleString('en-US',{style: 'percent', minimumFractionDigits:2})
             setSpreadPercent(percent);
         }
-    }, [spread])
+    }, [asks, bids, spread])
+
+    const togglePair = () => {
+        if (pair === "PI_XBTUSD") setPair("PI_ETHUSD")
+        if (pair === "PI_ETHUSD") setPair("PI_XBTUSD")
+    }
 
     return (
         <div className={styles.orderbook}>
             <div className={styles.header}>
-                <div className={styles.title}>Order Book</div>
+                <div className={styles.title}>Order Book 
+                    <span className={styles.pair}> ({pair})</span>
+                </div>
                 <div className={styles.spread}>Spread: {`${spread} (${spreadPercent})`}</div>
             </div>
             <OrderBookTable orderType="bid" orders={bids} total={totalBids}/>
             <OrderBookTable orderType="ask" orders={asks} total={totalAsks}/>
             <div className={styles.footer}>
-                <button className={styles.toggle}>Toggle Feed</button>
+                <button className={styles.toggle} onClick={() => togglePair()}>Toggle Feed</button>
             </div>
         </div>
     )
