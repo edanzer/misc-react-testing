@@ -1,6 +1,6 @@
 import { FinishedOrder, OrderType } from "../../types/orderBookTypes"
+import { toPercent } from "../../helpers/helpers"
 
-// Import Styles
 import styles from "./styles.module.css"
 
 interface OrderBookTableProps {
@@ -27,10 +27,6 @@ export const OrderBookTable = ({orders, orderType, total}: OrderBookTableProps) 
         };
 
         return rowBackground;
-    }
-
-    const toPercent = (num: number ): string => {
-        return num.toLocaleString('en-US',{style: 'percent', minimumFractionDigits:2})
     }
     
     return (

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { toPercent } from "../../helpers/helpers"
 import { useSubscribeOrderWorker }  from "../../hooks/useSubscribeOrderWorker"
 import { OrderBookTable } from "../OrderBookTable"
 
@@ -24,20 +25,14 @@ export const OrderBook = () => {
 
     useEffect(() => {
         if (asks[0] && bids[0]) {
-            const percent = (spread/asks[0].price).toLocaleString('en-US',{style: 'percent', minimumFractionDigits:2})
+            const percent = toPercent(spread/asks[0].price)
             setSpreadPercent(percent);
         }
     }, [asks, bids, spread])
 
     const togglePair = () => {
-        // if (pair === "PI_XBTUSD") setPair("PI_ETHUSD")
-        // if (pair === "PI_ETHUSD") setPair("PI_XBTUSD")
-        if (pair === "PI_XBTUSD") {
-            subscribe("PI_ETHUSD")
-        }
-        if (pair === "PI_ETHUSD") {
-            subscribe("PI_XBTUSD")
-        }
+        if (pair === "PI_XBTUSD") subscribe("PI_ETHUSD")
+        if (pair === "PI_ETHUSD") subscribe("PI_XBTUSD")
     }
 
     return (
@@ -46,7 +41,7 @@ export const OrderBook = () => {
                 <div className={styles.title}>Order Book 
                     <span className={styles.pair}> ({pair})</span>
                 </div>
-                <div className={styles.spread}>Spread: {`${spread} (${spreadPercent})`}</div>
+                <div className={styles.spread}>Spread: {`${spread.toFixed(2)} (${spreadPercent})`}</div>
             </div>
             <OrderBookTable orderType="bid" orders={bids} total={totalBids}/>
             <OrderBookTable orderType="ask" orders={asks} total={totalAsks}/>

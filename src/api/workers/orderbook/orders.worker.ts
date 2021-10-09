@@ -78,7 +78,7 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
         postMessage({ type: "subscribed", pair })
 
         // Also start timer to send udpate Orderbook back to React
-        timer = setInterval( () => sendOrderBook("update", rawOrderBook), 250 )
+        timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200)
         setTimeout(closeSocket, 8000); // For testing, close webocket after 5 seconds
     }
 
