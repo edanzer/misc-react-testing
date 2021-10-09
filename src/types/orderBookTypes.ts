@@ -18,3 +18,4 @@ export interface FinishedOrderBook {asks: FinishedOrder[], bids: FinishedOrder[]
 // Orderbook actions and types
 export type OrderBookAction = "initial" | "update" | "clear"
 export type OrderType = 'ask' | 'bid';
+export type Pair = "" | "PI_XBTUSD" | "PI_ETHUSD"

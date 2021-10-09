@@ -7,7 +7,7 @@ import styles from "./styles.module.css"
 
 export const OrderBook = () => {
 
-    const { asks, bids, pair, setPair } = useSubscribeOrderWorker()
+    const { asks, bids, pair, subscribe } = useSubscribeOrderWorker()
 
     const [ spread, setSpread ] = useState<number>(0)
     const [ spreadPercent, setSpreadPercent ] = useState<string>('')
@@ -30,8 +30,14 @@ export const OrderBook = () => {
     }, [asks, bids, spread])
 
     const togglePair = () => {
-        if (pair === "PI_XBTUSD") setPair("PI_ETHUSD")
-        if (pair === "PI_ETHUSD") setPair("PI_XBTUSD")
+        // if (pair === "PI_XBTUSD") setPair("PI_ETHUSD")
+        // if (pair === "PI_ETHUSD") setPair("PI_XBTUSD")
+        if (pair === "PI_XBTUSD") {
+            subscribe("PI_ETHUSD")
+        }
+        if (pair === "PI_ETHUSD") {
+            subscribe("PI_XBTUSD")
+        }
     }
 
     return (
@@ -45,7 +51,7 @@ export const OrderBook = () => {
             <OrderBookTable orderType="bid" orders={bids} total={totalBids}/>
             <OrderBookTable orderType="ask" orders={asks} total={totalAsks}/>
             <div className={styles.footer}>
-                <button className={styles.toggle} onClick={() => togglePair()}>Toggle Feed</button>
+                <button className={styles.toggle} onClick={togglePair}>Toggle Feed</button>
             </div>
         </div>
     )
