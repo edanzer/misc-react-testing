@@ -79,7 +79,7 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
 
         // Also start timer to send udpate Orderbook back to React
         timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200)
-        setTimeout(closeSocket, 8000); // For testing, close webocket after 5 seconds
+        setTimeout(closeSocket, 20000); // For testing, close webocket after 5 seconds
     }
 
     function unSubscribe(pair: Pair) {
