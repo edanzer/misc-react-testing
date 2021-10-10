@@ -26,7 +26,7 @@ export const useSubscribeOrderWorker = () => {
     }
 
     function handleMessage(e: MessageEvent) {
-        console.log(e);
+        // console.log(e);
         switch (e.data.type) {
             case "socketOpened":
                 subscribe(pair)

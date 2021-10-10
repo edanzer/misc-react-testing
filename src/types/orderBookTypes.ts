@@ -7,11 +7,27 @@ export type Price = number
 export type Size = number
 export type Total = number
 
-// Raw orders received from websocket
-export type RawOrder = [Price, Size]
-export type RawOrderBook = [ RawOrder[], RawOrder[] ]
+// Data format received from websocket
+export interface SocketSnapshot {
+    "numLevels": number,
+    "feed": string,
+    "bids": RawOrder[],
+    "asks": RawOrder[],
+    "product_id": Pair
+}
+export interface SocketUpdate {
+    "feed": string,
+    "bids": RawOrder[],
+    "asks": RawOrder[],
+    "product_id": Pair
+}
 
-// Finished orders, with totals, sent from worker to react
+// Raw orders 
+export type RawOrder = [Price, Size]
+export type RawOrderBook = [ RawOrder[], RawOrder[] ] | null
+
+// Finished orders, sent from worker to react
+export type OrderWithTotal = [Price, Size, Total]
 export interface FinishedOrder {price: Price, size: Size, total: Total}
 export interface FinishedOrderBook {asks: FinishedOrder[], bids: FinishedOrder[]}
 
