@@ -7,7 +7,7 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
     let isSubscribed: boolean = false
 
     let currentPair: Pair = ''
-    let rawOrderBook: RawOrderBook
+    let rawOrderBook: RawOrderBook = null
     let timer: NodeJS.Timeout
 
     /* 

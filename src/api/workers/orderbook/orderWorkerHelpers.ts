@@ -4,14 +4,15 @@ import {
     FinishedOrder,
     FinishedOrderBook,
     OrderBookAction, 
-    OrderType
+    OrderType,
+    OrderWithTotal
 } from "../../../types/orderBookTypes"
 
 /* 
  * Update the orderbook with new values
  */
 export function getUpdatedOrderBook(rawOrderBook: RawOrderBook, newAsks: RawOrder[], newBids: RawOrder[]): RawOrderBook {    
-    if (typeof rawOrderBook === 'undefined') {
+    if (rawOrderBook === null) {
         const updatedOrderbook: RawOrderBook = [ newAsks, newBids ]
         return updatedOrderbook
     }
@@ -44,9 +45,10 @@ export function getUpdatedOrders(currentOrders: RawOrder[], newOrders: RawOrder[
  * Post orderbook from this web worker to React
  */
 export function sendOrderBook(action: OrderBookAction, rawOrderBook: RawOrderBook): void { 
-    if (typeof rawOrderBook === 'undefined') return;   
-    const finishedOrderBook: FinishedOrderBook = prepareOrderBook(rawOrderBook);
+    if (rawOrderBook === null) return;   
 
+    const finishedOrderBook: FinishedOrderBook | null = prepareOrderBook(rawOrderBook);
+    
     postMessage({
         type: action,
         finishedOrderBook
@@ -56,10 +58,12 @@ export function sendOrderBook(action: OrderBookAction, rawOrderBook: RawOrderBoo
 /* 
  * Prepare the orderbook for posting back to React
  */
-export function prepareOrderBook(rawOrderBook: RawOrderBook): FinishedOrderBook {
+export function prepareOrderBook(rawOrderBook: RawOrderBook): FinishedOrderBook | null {
+    if (rawOrderBook === null) return null;
+
     const finishedOrderBook: FinishedOrderBook = {
-        asks: getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[0])),"ask")),
-        bids: getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[1])),"bid"))
+        asks: formatOrderbook(getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[0])),"ask"))),
+        bids: formatOrderbook(getTotals(sortOrders(trimTo25Orders(removeZeros(rawOrderBook[1])),"bid")))
     }
 
     return finishedOrderBook
@@ -99,18 +103,28 @@ export function sortOrders(orders: RawOrder[], orderType: OrderType) {
 /* 
  * Add cumulative order totals
  */
-export function getTotals(orders: RawOrder[]): FinishedOrder[] {
+export function getTotals(orders: RawOrder[]): OrderWithTotal[] {
     let total = 0
 
-    // Map through orders, update and add the total
-    const ordersWithTotals: FinishedOrder[] = orders.map(order => {
+    const ordersWithTotals: OrderWithTotal[] = orders.map(order => {
         total = total + order[1]
-        return {
-            price: order[0],
-            size: order[1],
-            total
-        }
+        return [ ...order, total ]
     })
 
     return ordersWithTotals
+}
+
+/* 
+ * Add cumulative order totals
+ */
+export function formatOrderbook(orders: OrderWithTotal[]): FinishedOrder[] {
+    const formattedOrderbook: FinishedOrder[] = orders.map(order => {
+        return {
+            price: order[0],
+            size: order[1],
+            total: order[2]
+        }
+    })
+
+    return formattedOrderbook
 }
