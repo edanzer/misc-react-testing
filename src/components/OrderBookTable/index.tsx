@@ -15,7 +15,7 @@ interface RowBackground {
 
 const getRowBackgroundStyles = (rowTotal: number, total: number, orderType: OrderType ): RowBackground => {
     const fraction = rowTotal/total
-    const direction = orderType === "bid" ? "-90deg" : "90deg"
+    const direction = (orderType === "ask" || window.innerWidth <= 600) ? "90deg" : "-90deg"
     const color = orderType === "bid" ? "rgba(0, 163, 108, .15)" : "rgba(238, 75, 43, .15)"
 
     const background = `linear-gradient(${direction}, ${color} ${toPercent(fraction)}, rgba(0,0,0,0) ${toPercent(fraction + .001)})`
