@@ -16,7 +16,7 @@ export const OrderBook = () => {
     const [ totalBids, setTotalBids ] = useState<number>(0)
     
     useEffect(() => {
-        if (asks[0] && bids[0]) {
+        if (asks.length && bids.length) {
             setTotalAsks(asks[asks.length-1].total)
             setTotalBids(bids[bids.length-1].total)
             setSpread(asks[0].price - bids[0].price)
