@@ -1,5 +1,5 @@
 // Import Resources
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import { FinishedOrder, Pair } from "../types/orderBookTypes";
 
 // eslint-disable-next-line
@@ -14,7 +14,7 @@ export const useSubscribeOrderWorker = () => {
     const [ bids, setBids ] = useState<FinishedOrder[]>([])
     const [ pair, setPair ] = useState<Pair>("PI_XBTUSD")
 
-    function subscribe(pair: Pair ): void {
+    const subscribe = useCallback((pair: Pair) => {
         if (worker.current) {
             worker.current.postMessage({
                 action: "subscribe",
@@ -23,10 +23,9 @@ export const useSubscribeOrderWorker = () => {
             })
         }
         setPair(pair)
-    }
+    }, []);
 
-    function handleMessage(e: MessageEvent) {
-        // console.log(e);
+    function handleMessagefromWorker(e: MessageEvent) {
         switch (e.data.type) {
             case "socketOpened":
                 subscribe(pair)
@@ -42,12 +41,12 @@ export const useSubscribeOrderWorker = () => {
             worker.current = new Worker()
             
             worker.current.postMessage({ action: "open", url, pair })
-            worker.current.addEventListener('message', handleMessage);
+            worker.current.addEventListener('message', handleMessagefromWorker);
         }
 
         return () => {               
             worker.current?.postMessage({action: "close" })
-            worker.current?.removeEventListener('message', handleMessage);
+            worker.current?.removeEventListener('message', handleMessagefromWorker);
             worker.current = null;
         }
     }, [])
