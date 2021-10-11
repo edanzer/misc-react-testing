@@ -46,20 +46,22 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
         // Listen  and respond to socket messages
         socket.onmessage = (event: MessageEvent) => {
             const data = JSON.parse(event.data)
+
             if (data.hasOwnProperty("event")) {
+
                 switch(data.event) {
                     case "subscribed": 
+                        postMessage({ type: "socketSubscribed", pair: data.product_ids })
                         isSubscribed = true
-                        currentPair = pair
-                        postMessage({ type: "socketSubscribed", pair })
-            
-                        // Also start timer to send udpate Orderbook back to React
+                        currentPair = data.product_ids[0]
+
+                        // Start timer to send udpates Orderbook back to React
                         timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200)
                         setTimeout(closeSocket, 20000); // For testing, close webocket after 5 seconds
                         break;
                     case "unsubscribed":
-                        isSubscribed = false
                         postMessage({ type: "socketUnsubscribed", pair: data.product_ids })
+                        isSubscribed = false
                         currentPair = ''
                         break;
                     case "subscribed-failed": 
