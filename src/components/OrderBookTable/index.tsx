@@ -37,7 +37,7 @@ export const OrderBookTable = ({orders, orderType, total}: OrderBookTableProps) 
                 <div className={styles.item}>Total</div>
             </div>
                 {
-                    orders.map((row: FinishedOrder) => (
+                    orders?.map((row: FinishedOrder) => (
                         <div key={row.price.toFixed(2)} className={`${styles.row} ${styles[orderType]}`} style={getRowBackgroundStyles(row.total, total, orderType)}>
                             <div className={`${styles.item} ${styles[orderType + "Price"]}`}>{row.price.toFixed(2)}</div>
                             <div className={styles.item}>{row.size.toLocaleString('en')}</div>
