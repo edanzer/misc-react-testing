@@ -1,6 +1,6 @@
-import { OrderBook } from "./index"
+import { OrderBook } from "../components/OrderBook/index"
 import { render } from '@testing-library/react'
-import { FinishedOrder, Pair } from "../../types/orderBookTypes"
+import { FinishedOrder, Pair } from "../types/orderBookTypes"
 
 /* 
  * Set up mock and mock data for useSubscribeOrderWorker hook.
@@ -26,7 +26,7 @@ const asks: FinishedOrder[] = [
 const pair: Pair = "PI_XBTUSD"
 const mockSubscribe = jest.fn()
 
-jest.mock("../../hooks/useSubscribeOrderWorker", () => ({
+jest.mock("../hooks/useSubscribeOrderWorker", () => ({
     useSubscribeOrderWorker: () => ({ asks, bids, pair, mockSubscribe })
 }));
 

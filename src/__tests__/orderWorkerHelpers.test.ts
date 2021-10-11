@@ -6,7 +6,7 @@ import {
     trimTo25Orders,
     sortOrders,
     getTotals, 
-    formatOrderbook } from "./orderWorkerHelpers"
+    formatOrderbook } from "../api/workers/orderbook/orderWorkerHelpers"
 import { 
     RawOrder,
     RawOrderBook,
@@ -14,7 +14,7 @@ import {
     FinishedOrderBook,
     OrderWithTotal, 
     SocketSnapshot,
-    SocketUpdate } from "../../../types/orderBookTypes"
+    SocketUpdate } from "../types/orderBookTypes"
 
 /*  
  * First, test individual functions discretely

@@ -1,6 +1,6 @@
-import { OrderBookTable } from "./index"
+import { OrderBookTable } from "../components/OrderBookTable/index"
 import { render } from '@testing-library/react'
-import { FinishedOrder } from "../../types/orderBookTypes";
+import { FinishedOrder } from "../types/orderBookTypes";
 
 describe('OrderBookTable component renders correctly', () => {
     const bids: FinishedOrder[] = [
