@@ -1,4 +1,3 @@
-// import { useSubscribeOrderWorker } from "../../../hooks/useSubscribeOrderWorker"
 import { RawOrderBook, Pair } from "../../../types/orderBookTypes"
 import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
 
@@ -39,74 +38,70 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
         // Open Socket
         socket = new WebSocket(url)
 
-        // Listen for and respond to socket onopen event
+        // Listen and respond to socket onopen event
         socket.onopen = () => {
             postMessage({ type: "socketOpened" })
         }
 
-        // Listen for and respond to socket messages
-        // Critical method for receiving and updating Orderbook
+        // Listen  and respond to socket messages
         socket.onmessage = (event: MessageEvent) => {
             const data = JSON.parse(event.data)
-            switch(data.hasOwnProperty("event")) {
-                case true: 
-                    console.log("socketEvent",  data)
-                    break;
-                case false:
-                    rawOrderBook = getUpdatedOrderBook(rawOrderBook, data.asks, data.bids)
-                    break;
-                default:
-                    console.log(data)
+            if (data.hasOwnProperty("event")) {
+                switch(data.event) {
+                    case "subscribed": 
+                        isSubscribed = true
+                        currentPair = pair
+                        postMessage({ type: "socketSubscribed", pair })
+            
+                        // Also start timer to send udpate Orderbook back to React
+                        timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200)
+                        setTimeout(closeSocket, 20000); // For testing, close webocket after 5 seconds
+                        break;
+                    case "unsubscribed":
+                        isSubscribed = false
+                        postMessage({ type: "socketUnsubscribed", currentPair })
+                        currentPair = ''
+                        break;
+                    case "subscribed-failed": 
+                        postMessage({ type: "socketSubscribedFailed", pair })
+                        break;
+                    case "unsubscribed-failed":
+                        postMessage({ type: "socketUnsubscribedFailed", currentPair })
+                        break;
+                    default:
+                        console.log(data)
+                }
+
+            } else if (data.hasOwnProperty("bids"))  {
+                rawOrderBook = getUpdatedOrderBook(rawOrderBook, data.asks, data.bids)
+            } else {
+                console.log("Unknown message received from socket:", data)
             }
         };
 
-        // Listen for and respond to socket close event
+        // Listen and respond to socket close event
         socket.onclose = () => {
             if (timer) clearTimeout(timer)
             postMessage({ type: "socketClosed" })
+            currentPair = ''
+            isSubscribed = false
         };
     }
 
     function subscribe(pair: Pair) {
-        // Subscribe
         const subscription = { "event": "subscribe", "feed": "book_ui_1", "product_ids": [pair] }
         socket.send(JSON.stringify(subscription))
-        
-        // Update local "state" values and send subscribed message to React
-        currentPair = pair
-        isSubscribed = true
-        postMessage({ type: "subscribed", pair })
-
-        // Also start timer to send udpate Orderbook back to React
-        timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200)
-        setTimeout(closeSocket, 20000); // For testing, close webocket after 5 seconds
     }
 
     function unSubscribe(pair: Pair) {
-        // Stop sending Orderbook updates to React
         if (timer) clearInterval(timer)
-        
-        // Unsubscribe
         const unsubscribe = { event: "unsubscribe", feed: "book_ui_1", product_ids: [pair] }
         socket.send(JSON.stringify(unsubscribe))
-
-        // Update local "state" and send unsubscribe message to React
-        currentPair = ''
-        isSubscribed = false
-        postMessage({ type: "unsubscribed", pair })
     }
 
     function closeSocket() {
-        // Stop sending Orderbook updates to React
         if (timer) clearInterval(timer)
-
-        // Close the socket
         socket.close()
-
-        // Update local "state" and send closed message to React
-        postMessage({ type: "socketClosed." })
-        currentPair = ''
-        isSubscribed = false
     }
 })()
 
