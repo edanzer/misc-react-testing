@@ -86,12 +86,26 @@
 
 @media only screen and (max-width: 600px) {
     .orderbook {
-        grid-template-rows: 10% 40% 40% 10%;
+        grid-template-rows: 40% 8% 40% 50px;
         grid-template-columns: 1fr;
         grid-template-areas:
-            "header"
             "bid"
+            "header"
             "ask"
             "footer";
+        overflow: hidden;
+    }
+    .header {
+        grid-template-columns: 50% 50%;
+    }
+    .title {
+        text-align: center;
+    }
+    .spread {
+        margin-left: 0;
+    }
+    .footer {
+        position: fixed;
+        height: 50px;
     }
 }
