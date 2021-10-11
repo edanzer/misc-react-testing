@@ -26,8 +26,7 @@ export const OrderBook = () => {
     }, [asks, bids, spread])
 
     const togglePair = () => {
-        if (pair === "PI_XBTUSD") subscribe("PI_ETHUSD")
-        if (pair === "PI_ETHUSD") subscribe("PI_XBTUSD")
+        subscribe(pair === "PI_XBTUSD" ? "PI_ETHUSD" : "PI_XBTUSD")
     }
 
     return (
