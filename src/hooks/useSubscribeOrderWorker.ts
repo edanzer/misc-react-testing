@@ -6,7 +6,7 @@ import { FinishedOrder, Pair } from "../types/orderBookTypes";
 import Worker from "worker-loader!../api/workers/orderbook/orders.worker.ts";
 
 
-export const useSubscribeOrderWorker = () => {
+export const useSubscribeOrderWorker = (): { asks: FinishedOrder[], bids: FinishedOrder[], pair: Pair, subscribe: Function} => {
     let worker = useRef<Worker | null>(null);
     const url = "wss://www.cryptofacilities.com/ws/v1"
 
@@ -35,8 +35,8 @@ export const useSubscribeOrderWorker = () => {
                 subscribe(pair)
                 break;
             case "update":
-                setAsks(e.data.finishedOrderBook.asks)
-                setBids(e.data.finishedOrderBook.bids)
+                setAsks(e.data.finishedOrderBook?.asks)
+                setBids(e.data.finishedOrderBook?.bids)
         }
     }
 
