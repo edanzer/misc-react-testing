@@ -2,7 +2,7 @@ import { RawOrderBook, Pair } from "../../../types/orderBookTypes"
 import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
 
 (function OrderWorker() {
-    let socket: WebSocket
+    let socket: WebSocket | null
     let isSubscribed: boolean = false
 
     let currentPair: Pair = ''
@@ -93,18 +93,18 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
 
     function subscribe(pair: Pair) {
         const subscription = { "event": "subscribe", "feed": "book_ui_1", "product_ids": [pair] }
-        socket.send(JSON.stringify(subscription))
+        if (socket) socket.send(JSON.stringify(subscription))
     }
 
     function unSubscribe(pair: Pair) {
         if (timer) clearInterval(timer)
         const unsubscribe = { event: "unsubscribe", feed: "book_ui_1", product_ids: [pair] }
-        socket.send(JSON.stringify(unsubscribe))
+        if (socket) socket.send(JSON.stringify(unsubscribe))
     }
 
     function closeSocket() {
         if (timer) clearInterval(timer)
-        socket.close()
+        if (socket) socket.close()
     }
 })()
 
