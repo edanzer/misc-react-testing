@@ -1,4 +1,14 @@
-Experimental project. 
+## Cryptocurrency Orderbook
+
+This is an experimental project to built a cryptocurrency orderbook. An orderbook is a list of all outstanding bids and asks, along with their respective prices and sizes. 
+
+The app connects to a third party websocket that provides up-to-date orderbook data for a range of cryptocurrencies. 
+
+The speed and volume of data that comes through the websocket is very large and risks overwhelming React's ability to rapidly and correctly re-render the order books. So the app leverages a web worker to open and manage the websocket. The worker receives messages and data from the websocket, and periodically sends a prepared and updated orderbook back to React for rendering.
+
+The app also shows a bar chart for volume of asks and bids, the current spread (difference between highest bid and lowest ask), and toggle button to toggle between crypocurrency trading pairs (there are only two for now, but more pairs could be easily added).
+
+See live demo here: [https://trading-book.netlify.app/](https://trading-book.netlify.app/)
 
 ## Available Scripts
 
