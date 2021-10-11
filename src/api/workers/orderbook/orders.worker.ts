@@ -59,14 +59,17 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                         break;
                     case "unsubscribed":
                         isSubscribed = false
-                        postMessage({ type: "socketUnsubscribed", currentPair })
+                        postMessage({ type: "socketUnsubscribed", pair: data.product_ids })
                         currentPair = ''
                         break;
                     case "subscribed-failed": 
-                        postMessage({ type: "socketSubscribedFailed", pair })
+                        postMessage({ type: "socketSubscribedFailed", pair: data.product_ids })
                         break;
                     case "unsubscribed-failed":
-                        postMessage({ type: "socketUnsubscribedFailed", currentPair })
+                        postMessage({ type: "socketUnsubscribedFailed", pair: data.product_ids })
+                        break;
+                    case "error":
+                        postMessage({ type: "socketError", message: data.message })
                         break;
                     default:
                         console.log(data)
