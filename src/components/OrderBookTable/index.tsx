@@ -1,6 +1,5 @@
 import { FinishedOrder, OrderType } from "../../types/orderBookTypes"
 import { toPercent } from "../../helpers/helpers"
-
 import styles from "./styles.module.css"
 
 interface OrderBookTableProps {

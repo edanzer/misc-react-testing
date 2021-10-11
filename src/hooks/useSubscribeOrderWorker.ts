@@ -1,10 +1,13 @@
-// Import Resources
 import { useEffect, useState, useRef, useCallback } from "react"
 import { FinishedOrder, Pair } from "../types/orderBookTypes";
 
+/*
+ * NOTE: Loading web workers is tricky without ejecting Create React App.
+ * The below method was the simplest of immediate obvious options.
+ * But it also requires an extra line for eslint.
+ */
 // eslint-disable-next-line
 import Worker from "worker-loader!../api/workers/orderbook/orders.worker.ts";
-
 
 export const useSubscribeOrderWorker = (): { asks: FinishedOrder[], bids: FinishedOrder[], pair: Pair, subscribe: Function} => {
     let worker = useRef<Worker | null>(null);
@@ -12,6 +15,11 @@ export const useSubscribeOrderWorker = (): { asks: FinishedOrder[], bids: Finish
 
     const [ asks, setAsks ] = useState<FinishedOrder[]>([])
     const [ bids, setBids ] = useState<FinishedOrder[]>([])
+    /*
+     * NOTE: The pair should likely belong to global state. 
+     * Other aspects of the trading interface, like charts,
+     * will also udpate based on the pair.
+     */
     const [ pair, setPair ] = useState<Pair>("PI_XBTUSD")
 
     const subscribe = useCallback((newPair: Pair) => {
@@ -26,7 +34,7 @@ export const useSubscribeOrderWorker = (): { asks: FinishedOrder[], bids: Finish
     }, []);
 
     /* 
-     * This method should be updated to handle other
+     * NOTE: This method should be updated to handle other
      * possible message types received from worker.
      */
     function handleMessagefromWorker(e: MessageEvent) {

@@ -2,8 +2,6 @@ import { useState, useEffect } from "react"
 import { toPercent } from "../../helpers/helpers"
 import { useSubscribeOrderWorker }  from "../../hooks/useSubscribeOrderWorker"
 import { OrderBookTable } from "../OrderBookTable"
-
-// Import Styles
 import styles from "./styles.module.css"
 
 export const OrderBook = () => {

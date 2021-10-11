@@ -55,7 +55,15 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                         isSubscribed = true
                         currentPair = data.product_ids[0]
 
-                        // Start timer to send udpates Orderbook back to React
+                        /*
+                         * Start timer to send udpates Orderbook back to React.
+                         * 
+                         * NOTE: This is a crude timer method. For production, we'd want
+                         * something more robust. 
+                         * 
+                         * NOTE: This timer does not yet account for device
+                         * or connection speeds per project criteria.
+                         */
                         timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200)
                         setTimeout(closeSocket, 20000); // For testing, close webocket after 5 seconds
                         break;
