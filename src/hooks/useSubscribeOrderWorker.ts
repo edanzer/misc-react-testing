@@ -14,17 +14,21 @@ export const useSubscribeOrderWorker = () => {
     const [ bids, setBids ] = useState<FinishedOrder[]>([])
     const [ pair, setPair ] = useState<Pair>("PI_XBTUSD")
 
-    const subscribe = useCallback((pair: Pair) => {
+    const subscribe = useCallback((newPair: Pair) => {
         if (worker.current) {
             worker.current.postMessage({
                 action: "subscribe",
                 url,
-                pair
+                pair: newPair
             })
         }
-        setPair(pair)
+        setPair(newPair)
     }, []);
 
+    /* 
+     * This method should be updated to handle other
+     * possible message types received from worker.
+     */
     function handleMessagefromWorker(e: MessageEvent) {
         switch (e.data.type) {
             case "socketOpened":
