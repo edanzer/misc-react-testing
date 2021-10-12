@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { toPercent } from "../../helpers/helpers"
 import { useSubscribeOrderWorker }  from "../../hooks/useSubscribeOrderWorker"
 import { Pair } from "../../types/orderBookTypes"
@@ -7,7 +7,6 @@ import styles from "./styles.module.css"
 
 export const OrderBook = () => {
 
-    
     /*
      * NOTE: The pair should belong to global state. 
      * Other aspects of the trading interface like charts,
@@ -19,7 +18,7 @@ export const OrderBook = () => {
      */
     const [ pair, setPair ] = useState<Pair>("PI_XBTUSD")
     const url = "wss://www.cryptofacilities.com/ws/v1"
-    const { asks, bids, openSocket, closeSocket, subscribe } = useSubscribeOrderWorker(url, pair)
+    const { asks, bids, openSocket, closeSocket, subscribeToPair } = useSubscribeOrderWorker(url, pair)
     
     const haveAsks: boolean = Boolean(asks.length > 0)
     const haveBids: boolean = Boolean(bids.length > 0)
@@ -27,29 +26,11 @@ export const OrderBook = () => {
     const totalBids: number = haveBids ? bids[bids.length-1].total : 0
     const spread: number = (haveAsks && haveBids) ? asks?.[0].price - bids[0].price : 0
     const spreadPercent: string = spread ? toPercent(spread/asks[0].price) : ''
-
-    useEffect(() => {
-        const handleWindowLoseFocus = () => {
-            if(document.visibilityState==="hidden"){
-                console.log("Tab lost visibility. Socket closed.")
-                closeSocket()
-            }
-            else{
-                console.log("Tab now visible. Socket opened")
-                openSocket(url, pair)
-            }
-        } 
-        document.addEventListener("visibilitychange", handleWindowLoseFocus)
-
-        return () => {               
-            document.removeEventListener("blur", handleWindowLoseFocus);
-        }
-    }, [])
     
     const togglePair = () => {
         let newPair: Pair = (pair === "PI_XBTUSD") ? "PI_ETHUSD" : "PI_XBTUSD"
+        subscribeToPair(newPair)
         setPair(newPair)
-        subscribe(newPair)
     }
 
     return (

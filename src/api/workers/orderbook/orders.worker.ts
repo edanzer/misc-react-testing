@@ -16,7 +16,7 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
         const message = e.data
         switch(message.action) {
             case "open":
-                openSocket(message.url, message.pair)
+                openSocket(message.url)
                 break;
             case "subscribe":
                 /* 
@@ -48,7 +48,7 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
     /* 
      * Open socket and set up socket event listeners
      */
-    function openSocket(url: string, pair: Pair) {
+    function openSocket(url: string) {
 
         // Open Socket
         socket = new WebSocket(url)
@@ -133,6 +133,7 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
         if (timer) clearInterval(timer)
         if (socket) socket.close()
     }
+
 })()
 
 export default {}

@@ -9,7 +9,7 @@ import { FinishedOrder, Pair } from "../types/orderBookTypes";
 // eslint-disable-next-line
 import Worker from "worker-loader!../api/workers/orderbook/orders.worker.ts";
 
-export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: FinishedOrder[], bids: FinishedOrder[], openSocket: Function, closeSocket: Function, subscribe: Function, } => {
+export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: FinishedOrder[], bids: FinishedOrder[], openSocket: Function, closeSocket: Function, subscribeToPair: Function, } => {
     let worker = useRef<Worker | null>(null);
     const [ asks, setAsks ] = useState<FinishedOrder[]>([])
     const [ bids, setBids ] = useState<FinishedOrder[]>([])
@@ -17,14 +17,15 @@ export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: Finish
     /* 
      * Sends message to worker to open the socket
      */
-    const openSocket = useCallback((url, pair) => {
+    const openSocket = useCallback(() => {
         if (!worker.current) {
             worker.current = new Worker()
             
-            worker.current.postMessage({ action: "open", url, pair })
-            worker.current.addEventListener('message', handleMessagefromWorker);
+            worker.current.postMessage({ action: "open", url })
+            worker.current.addEventListener('message', handleMessagefromWorker)
+            document.addEventListener("visibilitychange", handleWindowLoseFocus)
         }
-    }, []);
+    }, [url]);
 
     /* 
      * Sends message to worker to close the socket
@@ -32,7 +33,8 @@ export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: Finish
     const closeSocket = useCallback(() => {
         if (worker.current) {
             worker.current?.postMessage({action: "close" })
-            worker.current?.removeEventListener('message', handleMessagefromWorker);
+            worker.current?.removeEventListener('message', handleMessagefromWorker)
+            document.removeEventListener("blur", handleWindowLoseFocus);
             worker.current = null;
         }
     }, []);
@@ -40,11 +42,10 @@ export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: Finish
     /* 
      * Sends message to worker to subscribe to trading pair
      */
-    const subscribe = useCallback((newPair: Pair) => {
+    const subscribeToPair = useCallback((newPair: Pair) => {
         if (worker.current) {
             worker.current.postMessage({
                 action: "subscribe",
-                url,
                 pair: newPair
             })
         }
@@ -59,7 +60,7 @@ export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: Finish
     const handleMessagefromWorker = (e: MessageEvent) => {
         switch (e.data.type) {
             case "socketOpened":
-                subscribe(pair)
+                subscribeToPair(pair)
                 break;
             case "update":
                 setAsks(e.data.finishedOrderBook?.asks)
@@ -68,13 +69,29 @@ export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: Finish
         }
     }
 
-    useEffect(() => {
-        openSocket(url, pair)
+    /* 
+     * Ensure that socket is closed when window loses focus.
+     * Reopen socket if window comes back in focus.
+     */
+    const handleWindowLoseFocus = () => {
+        if(document.visibilityState==="hidden"){
+            console.log("Tab lost visibility. Socket closed.")
+            closeSocket()
+        }
+        else{
+            console.log("Tab now visible. Socket opened")
+            openSocket()
+            subscribeToPair(pair)
+        }
+    } 
 
+    useEffect(() => {
+        openSocket()
+    
         return () => {               
             closeSocket()
         }
     }, [])
 
-    return { asks, bids, openSocket, closeSocket, subscribe } 
+    return { asks, bids, openSocket, closeSocket, subscribeToPair } 
 }
