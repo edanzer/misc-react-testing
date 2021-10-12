@@ -9,19 +9,37 @@ import { FinishedOrder, Pair } from "../types/orderBookTypes";
 // eslint-disable-next-line
 import Worker from "worker-loader!../api/workers/orderbook/orders.worker.ts";
 
-export const useSubscribeOrderWorker = (): { asks: FinishedOrder[], bids: FinishedOrder[], pair: Pair, subscribe: Function} => {
+export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: FinishedOrder[], bids: FinishedOrder[], openSocket: Function, closeSocket: Function, subscribe: Function, } => {
     let worker = useRef<Worker | null>(null);
-    const url = "wss://www.cryptofacilities.com/ws/v1"
-
     const [ asks, setAsks ] = useState<FinishedOrder[]>([])
     const [ bids, setBids ] = useState<FinishedOrder[]>([])
-    /*
-     * NOTE: The pair should likely belong to global state. 
-     * Other aspects of the trading interface, like charts,
-     * will also udpate based on the pair.
-     */
-    const [ pair, setPair ] = useState<Pair>("PI_XBTUSD")
 
+    /* 
+     * Sends message to worker to open the socket
+     */
+    const openSocket = useCallback((url, pair) => {
+        if (!worker.current) {
+            worker.current = new Worker()
+            
+            worker.current.postMessage({ action: "open", url, pair })
+            worker.current.addEventListener('message', handleMessagefromWorker);
+        }
+    }, []);
+
+    /* 
+     * Sends message to worker to close the socket
+     */
+    const closeSocket = useCallback(() => {
+        if (worker.current) {
+            worker.current?.postMessage({action: "close" })
+            worker.current?.removeEventListener('message', handleMessagefromWorker);
+            worker.current = null;
+        }
+    }, []);
+
+    /* 
+     * Sends message to worker to subscribe to trading pair
+     */
     const subscribe = useCallback((newPair: Pair) => {
         if (worker.current) {
             worker.current.postMessage({
@@ -30,14 +48,15 @@ export const useSubscribeOrderWorker = (): { asks: FinishedOrder[], bids: Finish
                 pair: newPair
             })
         }
-        setPair(newPair)
     }, []);
 
     /* 
+     * Handles incoming messages from Socket
+     *
      * NOTE: This method should be updated to handle other
      * possible message types received from worker.
      */
-    function handleMessagefromWorker(e: MessageEvent) {
+    const handleMessagefromWorker = (e: MessageEvent) => {
         switch (e.data.type) {
             case "socketOpened":
                 subscribe(pair)
@@ -50,19 +69,12 @@ export const useSubscribeOrderWorker = (): { asks: FinishedOrder[], bids: Finish
     }
 
     useEffect(() => {
-        if (!worker.current) {
-            worker.current = new Worker()
-            
-            worker.current.postMessage({ action: "open", url, pair })
-            worker.current.addEventListener('message', handleMessagefromWorker);
-        }
+        openSocket(url, pair)
 
         return () => {               
-            worker.current?.postMessage({action: "close" })
-            worker.current?.removeEventListener('message', handleMessagefromWorker);
-            worker.current = null;
+            closeSocket()
         }
     }, [])
 
-    return { asks, bids, pair, subscribe } 
+    return { asks, bids, openSocket, closeSocket, subscribe } 
 }
