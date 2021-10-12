@@ -8,20 +8,12 @@ export const OrderBook = () => {
 
     const { asks, bids, pair, subscribe } = useSubscribeOrderWorker()
 
-    const [ spread, setSpread ] = useState<number>(0)
-    const [ spreadPercent, setSpreadPercent ] = useState<string>('')
-    const [ totalAsks, setTotalAsks ] = useState<number>(0)
-    const [ totalBids, setTotalBids ] = useState<number>(0)
-    
-    useEffect(() => {
-        if (asks.length && bids.length) {
-            setTotalAsks(asks[asks.length-1].total)
-            setTotalBids(bids[bids.length-1].total)
-            setSpread(asks[0].price - bids[0].price)
-            const percent = toPercent(spread/asks[0].price)
-            setSpreadPercent(percent);
-        }
-    }, [asks, bids, spread])
+    const haveAsks: boolean = Boolean(asks.length > 0)
+    const haveBids: boolean = Boolean(bids.length > 0)
+    const totalAsks: number = haveAsks ? asks[asks.length-1].total : 0
+    const totalBids: number = haveBids ? bids[bids.length-1].total : 0
+    const spread: number = (haveAsks && haveBids) ? asks?.[0].price - bids[0].price : 0
+    const spreadPercent: string = spread ? toPercent(spread/asks[0].price) : ''
 
     const togglePair = () => {
         subscribe(pair === "PI_XBTUSD" ? "PI_ETHUSD" : "PI_XBTUSD")
