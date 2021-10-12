@@ -1,7 +1,4 @@
-// Import Components
 import { OrderBook } from './components/OrderBook'
-
-// Import Styles
 import './App.scss';
 
 function App() {

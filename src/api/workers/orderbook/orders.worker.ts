@@ -20,9 +20,9 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                 break;
             case "subscribe":
                 /* 
-                 * NOTE: Managing/switching subscription needs
+                 * Managing/switching subscription needs
                  * additional thought or discussion. These events
-                 * are asyncronous. And as is, it would be possible
+                 * are asyncronous. Ss is, it would be possible
                  * to have multiple subscriptions at once. 
                  * 
                  * A simple choice here would be to close the socket
@@ -30,8 +30,8 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                  * ensure any/all existing subscriptions are cleared
                  * before starting a new one.
                  * 
-                 * Otherwise some extra logic or checks need to be
-                 * added to ensure only one subscription exists at once,
+                 * Otherwise extra logic or checks should be added
+                 * to ensure only one subscription exists at once,
                  * and new subscriptions are only added when we 
                  * receive confirmation from the websocket that older
                  * subscriptions are officially unsubscribed.
@@ -71,13 +71,8 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                         currentPair = data.product_ids[0]
 
                         /*
-                         * Start timer to send udpates Orderbook back to React.
-                         * 
-                         * NOTE: This is a crude timer method. For production, we'd want
-                         * something more robust. 
-                         * 
-                         * NOTE: This timer does not account for device
-                         * or connection speeds per project criteria.
+                         * This does not account for device
+                         * or connection speeds.
                          */
                         timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200)
                         break;
@@ -105,7 +100,6 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                 rawOrderBook = getUpdatedOrderBook(rawOrderBook, data.asks, data.bids)
 
             }
-
         };
 
         // Listen and respond to socket close event

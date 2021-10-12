@@ -8,13 +8,9 @@ import styles from "./styles.module.css"
 export const OrderBook = () => {
 
     /*
-     * NOTE: The pair should belong to global state. 
-     * Other aspects of the trading interface like charts,
-     * will also depend on the pair.
-     * 
-     * NOTE: Although url is specific to the orderbook, 
-     * it should probably be stored in an env variable, 
-     * possibly passed in as prop to the Orderbook.
+     * The pair should probably belong to global state. 
+     * Other aspects of the trading interface (charts,
+     * buy/sell, account balance) will depend on pair.
      */
     const [ pair, setPair ] = useState<Pair>("PI_XBTUSD")
     const { asks, bids, subscribeToPair } = useSubscribeOrderWorker(pair)

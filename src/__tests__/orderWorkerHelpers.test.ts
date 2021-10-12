@@ -147,7 +147,7 @@ describe('individual functions for preparing ', () => {
 
 /*  
  * Second, test everything together.
- * Should take in raw snapshot and update and output finished orderbook.
+ * Should take in raw snapshot/update and output finished orderbook.
  * Also use larger, more complete, moire realistic data set. 
  */
 describe('test overall orderbook preparation', () => {

@@ -2,14 +2,22 @@ import { useEffect, useState, useRef, useCallback } from "react"
 import { FinishedOrder, Pair } from "../types/orderBookTypes";
 
 /*
- * NOTE: Loading web workers is tricky without ejecting Create React App.
- * The below method was the simplest of immediate obvious options.
+ * Loading web workers without ejecting Create React App is
+ * a bit tricky. The method below was the simplest.
  * But it also requires an extra line for eslint.
  */
 // eslint-disable-next-line
 import Worker from "worker-loader!../api/workers/orderbook/orders.worker.ts";
 
-export const useSubscribeOrderWorker = (pair: Pair): { asks: FinishedOrder[], bids: FinishedOrder[], openSocket: Function, closeSocket: Function, subscribeToPair: Function, } => {
+interface UseSubscribeOrderWorkerReturn {
+        asks: FinishedOrder[], 
+        bids: FinishedOrder[], 
+        openSocket: Function, 
+        closeSocket: Function, 
+        subscribeToPair: Function
+}
+
+export const useSubscribeOrderWorker = (pair: Pair): UseSubscribeOrderWorkerReturn => {
     const url = "wss://www.cryptofacilities.com/ws/v1"
     let worker = useRef<Worker | null>(null);
     const [ asks, setAsks ] = useState<FinishedOrder[]>([])
@@ -55,7 +63,7 @@ export const useSubscribeOrderWorker = (pair: Pair): { asks: FinishedOrder[], bi
     /* 
      * Handles incoming messages from socket
      *
-     * NOTE: This method should be updated to handle other
+     * This method should be updated to handle other
      * possible message types received from worker.
      */
     const handleMessagefromWorker = (e: MessageEvent) => {
@@ -71,8 +79,8 @@ export const useSubscribeOrderWorker = (pair: Pair): { asks: FinishedOrder[], bi
     }
 
     /* 
-     * Ensure that socket is closed when window loses focus.
-     * Reopen socket if window comes back in focus.
+     * Close socket when window loses focus.
+     * Open socket when window gains focus.
      */
     const handleWindowLoseFocus = () => {
         if (document.visibilityState==="hidden") {
