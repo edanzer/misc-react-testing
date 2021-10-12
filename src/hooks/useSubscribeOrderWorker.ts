@@ -9,7 +9,8 @@ import { FinishedOrder, Pair } from "../types/orderBookTypes";
 // eslint-disable-next-line
 import Worker from "worker-loader!../api/workers/orderbook/orders.worker.ts";
 
-export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: FinishedOrder[], bids: FinishedOrder[], openSocket: Function, closeSocket: Function, subscribeToPair: Function, } => {
+export const useSubscribeOrderWorker = (pair: Pair): { asks: FinishedOrder[], bids: FinishedOrder[], openSocket: Function, closeSocket: Function, subscribeToPair: Function, } => {
+    const url = "wss://www.cryptofacilities.com/ws/v1"
     let worker = useRef<Worker | null>(null);
     const [ asks, setAsks ] = useState<FinishedOrder[]>([])
     const [ bids, setBids ] = useState<FinishedOrder[]>([])
@@ -52,7 +53,7 @@ export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: Finish
     }, []);
 
     /* 
-     * Handles incoming messages from Socket
+     * Handles incoming messages from socket
      *
      * NOTE: This method should be updated to handle other
      * possible message types received from worker.
@@ -74,12 +75,9 @@ export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: Finish
      * Reopen socket if window comes back in focus.
      */
     const handleWindowLoseFocus = () => {
-        if(document.visibilityState==="hidden"){
-            console.log("Tab lost visibility. Socket closed.")
+        if (document.visibilityState==="hidden") {
             closeSocket()
-        }
-        else{
-            console.log("Tab now visible. Socket opened")
+        } else {
             openSocket()
             subscribeToPair(pair)
         }
@@ -88,9 +86,7 @@ export const useSubscribeOrderWorker = (url: string, pair: Pair): { asks: Finish
     useEffect(() => {
         openSocket()
     
-        return () => {               
-            closeSocket()
-        }
+        return () => closeSocket()
     }, [])
 
     return { asks, bids, openSocket, closeSocket, subscribeToPair } 

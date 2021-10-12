@@ -17,8 +17,7 @@ export const OrderBook = () => {
      * possibly passed in as prop to the Orderbook.
      */
     const [ pair, setPair ] = useState<Pair>("PI_XBTUSD")
-    const url = "wss://www.cryptofacilities.com/ws/v1"
-    const { asks, bids, openSocket, closeSocket, subscribeToPair } = useSubscribeOrderWorker(url, pair)
+    const { asks, bids, subscribeToPair } = useSubscribeOrderWorker(pair)
     
     const haveAsks: boolean = Boolean(asks.length > 0)
     const haveBids: boolean = Boolean(bids.length > 0)
