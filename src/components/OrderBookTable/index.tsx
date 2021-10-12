@@ -20,7 +20,8 @@ const getRowBackgroundStyles = (rowTotal: number, total: number, orderType: Orde
     const background = `linear-gradient(${direction}, ${color} ${toPercent(fraction)}, rgba(0,0,0,0) ${toPercent(fraction + .001)})`
 
     const rowBackground = {
-        background
+        background,
+        transform: "translateZ(0)"
     };
 
     return rowBackground;

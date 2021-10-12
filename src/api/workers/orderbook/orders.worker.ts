@@ -7,8 +7,9 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
 
     let currentPair: Pair = ''
     let rawOrderBook: RawOrderBook = null
-    let timer: NodeJS.Timeout
+    let timer: ReturnType<typeof setInterval>
 
+    
     /* 
     * Handle messages from React 
     */
@@ -25,8 +26,6 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
             case "close":
                 closeSocket()
                 break;
-            default:
-                console.log('Invalid action');
         }
     }
 
@@ -47,7 +46,7 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
         socket.onmessage = (event: MessageEvent) => {
             const data = JSON.parse(event.data)
 
-            if (data.hasOwnProperty("event")) {
+            if (data?.event) {
 
                 switch(data.event) {
                     case "subscribed": 
@@ -82,14 +81,16 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                         postMessage({ type: "socketError", message: data.message })
                         break;
                     default:
-                        console.log(data)
+                        postMessage({ type: "socketUnknownEvent", message: data.message })
                 }
 
-            } else if (data.hasOwnProperty("bids"))  {
+            } else if (data?.bids)  {
+
+                // This handles both initial snapshot and subsequent updates
                 rawOrderBook = getUpdatedOrderBook(rawOrderBook, data.asks, data.bids)
-            } else {
-                console.log("Unknown message received from socket:", data)
+
             }
+
         };
 
         // Listen and respond to socket close event
