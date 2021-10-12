@@ -30,7 +30,7 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                  * ensure any/all existing subscriptions are cleared
                  * before starting a new one.
                  * 
-                 * Otherwise some complex logic or checks need to be
+                 * Otherwise some extra logic or checks need to be
                  * added to ensure only one subscription exists at once,
                  * and new subscriptions are only added when we 
                  * receive confirmation from the websocket that older
@@ -76,11 +76,10 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                          * NOTE: This is a crude timer method. For production, we'd want
                          * something more robust. 
                          * 
-                         * NOTE: This timer does not yet account for device
+                         * NOTE: This timer does not account for device
                          * or connection speeds per project criteria.
                          */
                         timer = setInterval( () => sendOrderBook("update", rawOrderBook), 200)
-                        setTimeout(closeSocket, 20000); // For testing, close webocket after 5 seconds
                         break;
                     case "unsubscribed":
                         postMessage({ type: "socketUnsubscribed", pair: data.product_ids })
