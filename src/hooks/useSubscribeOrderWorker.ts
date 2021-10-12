@@ -45,6 +45,7 @@ export const useSubscribeOrderWorker = (): { asks: FinishedOrder[], bids: Finish
             case "update":
                 setAsks(e.data.finishedOrderBook?.asks)
                 setBids(e.data.finishedOrderBook?.bids)
+                break;
         }
     }
 
