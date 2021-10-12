@@ -9,7 +9,6 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
     let rawOrderBook: RawOrderBook = null
     let timer: ReturnType<typeof setInterval>
 
-    
     /* 
     * Handle messages from React 
     */
@@ -20,6 +19,23 @@ import { getUpdatedOrderBook, sendOrderBook } from "./orderWorkerHelpers"
                 openSocket(message.url, message.pair)
                 break;
             case "subscribe":
+                /* 
+                 * NOTE: Managing/switching subscription needs
+                 * additional thought or discussion. These events
+                 * are asyncronous. And as is, it would be possible
+                 * to have multiple subscriptions at once. 
+                 * 
+                 * A simple choice here would be to close the socket
+                 * entirely when changing subscriptions. That would
+                 * ensure any/all existing subscriptions are cleared
+                 * before starting a new one.
+                 * 
+                 * Otherwise some complex logic or checks need to be
+                 * added to ensure only one subscription exists at once,
+                 * and new subscriptions are only added when we 
+                 * receive confirmation from the websocket that older
+                 * subscriptions are officially unsubscribed.
+                 */ 
                 if (isSubscribed) unSubscribe(currentPair)
                 subscribe(message.pair)
                 break;
